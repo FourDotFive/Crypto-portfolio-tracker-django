@@ -1,5 +1,4 @@
 import requests
-from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 import pprint
@@ -19,17 +18,10 @@ def get_toplist_by_market_cap(limit: int = 10):
         cleaned_data = {}
         for crypto in data['Data']:
             full_name = crypto['CoinInfo']['FullName']
-            pprint.pprint(full_name)
             cleaned_data[full_name] = {
                 'Symbol': crypto['CoinInfo']['Name'],
-                'Price': crypto['DISPLAY']['USD']['PRICE']
+                'ImageUrl': 'https://www.cryptocompare.com' + crypto['CoinInfo']['ImageUrl']
             }
-
-            # pprint.pprint(crypto)
-            # pprint.pprint(crypto['CoinInfo'])
-            # pprint.pprint(crypto['DISPLAY'])
-            # pprint.pprint(crypto['RAW'])
-        print(cleaned_data)
         return cleaned_data
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         pprint.pprint(e)
