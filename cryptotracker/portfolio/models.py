@@ -1,11 +1,8 @@
 from django.db import models
 from datetime import datetime
+from django.contrib.auth import get_user_model
 
-
-class User(models.Model):
-    nickname = models.CharField(max_length=20)
-    password = models.CharField(max_length=20)
-    email = models.CharField(max_length=64)
+User = get_user_model()
 
 
 class Portfolio(models.Model):

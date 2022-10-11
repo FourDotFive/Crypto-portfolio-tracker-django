@@ -1,0 +1,212 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Crypto Portfolio Tracker{% endblock %}
+    </title>
+
+    <script src="https://code.jquery.com/jquery-3.6.1.js"
+        integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/messages.css' %}">
+
+    {% block additional_libraries %}
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="{% static 'css/apexcharts.css' %}">
+    <script src="{% static 'js/cryptocompare_connection.js' %}"></script>
+    <script src="{% static 'js/pie_grapher.js' %}"></script>
+    {% endblock %}
+
+</head>
+
+<body>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+        <div class="toast toast-warning mt-3">
+            <div class="toast-header toast-warning">
+                <strong class="me-auto"><i class="bi bi-exclamation-triangle"></i> Warning</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        <div class="toast toast-info mt-3">
+            <div class="toast-header toast-info">
+                <strong class="me-auto"><i class="bi bi-info-circle"></i> Info</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        <div class="toast toast-success mt-3">
+            <div class="toast-header toast-success">
+                <strong class="me-auto"><i class="bi bi-check2-circle"></i> Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <div class="toast toast-error mt-3">
+            <div class="toast-header toast-error">
+                <strong class="me-auto"><i class="bi bi-exclamation-diamond"></i> Error</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'main' %}">
+                <i class="bi bi-briefcase-fill mx-1" style="font-size: 20px;"></i>
+                Crypto Portfolio Tracker
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">My Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Market</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a class="btn btn rounded btn-md" id="login_btn" href="#" role="button">Login</a>
+                    <a class="btn btn-primary rounded btn-md" href="{% url 'registration' %}" role="button">Get
+                        Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-7 mx-auto text-center">
+                <h1 class="mt-3">Create and Track Your Crypto Portfolio From One Place
+                    <i class="bi bi-briefcase-fill" style="font-size: 40px;"></i>
+                </h1>
+                <h4 class="mt-3">The app to track all your investments. Make smart moves only.</h5>
+                    <h4>Just Register or Sign In to Start</h5>
+
+                        <a class="btn btn-primary rounded btn-lg mt-3 mb-5" href="{% url 'registration' %}"
+                            role="button">Get Started</a>
+
+                        <div class="row">
+                            <div class="col">
+                                <div id="chart"></div>
+                            </div>
+                        </div>
+
+                        <table class="table mb-3 mt-5">
+                            <thead>
+                                <th>Name</th>
+                                <th>Market Cap</th>
+                                <th>Price</th>
+                                <th>Chg in 1h</th>
+                                <th>Chg in 24h</th>
+                            </thead>
+                            <tbody id="toplist_by_market_cap">
+                                {% for crypto_name, data in toplist_by_market_cap.items %}
+                                <tr id="{{ data.Symbol|lower }}">
+                                    <td>
+                                        <a href="{% url 'graph' data.Symbol|lower %}">
+                                            <img src="{{ data.ImageUrl }}" width="25">
+                                            {{ data.Symbol }}
+                                        </a>
+                                    </td>
+                                    <td id="{{ data.Symbol|lower }}_marketcap"></td>
+                                    <td id="{{ data.Symbol|lower }}_price"></td>
+                                    <td id="{{ data.Symbol|lower }}_change1h"></td>
+                                    <td id="{{ data.Symbol|lower }}_change24h"></td>
+
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+
+            </div>
+        </div>
+    </div>
+
+
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+
+    <!-- <script>
+        $(document).ready(function () {
+            let dt = new Date();
+            $(".toast-time").each(function () {
+                let time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                $(this).text(time);
+            });
+
+            $(".toast").toast('show');
+        });
+    </script> -->
+
+    <script>
+        $(document).ready(function () {
+            $(".toast-warning").css("background-color", "#fbf0da");
+            $(".toast-warning").css("color", "#73510d");
+            $(".toast-warning").css("border-color", "#f9e4be");
+
+            $(".toast-success").css("background-color", "#d6f0e0");
+            $(".toast-success").css("color", "#0d6832");
+            $(".toast-success").css("border-color", "#c0e7d0");
+
+            $(".toast-info").css("background-color", "#def1f7");
+            $(".toast-info").css("color", "#1c657d");
+            $(".toast-info").css("border-color", "#c6e6f1");
+
+            $(".toast-error").css("background-color", "#f9e1e5");
+            $(".toast-error").css("color", "#af233a");
+            $(".toast-error").css("border-color", "#f4c8cf");
+
+            $(".toast").toast('show');
+        });
+    </script>
+
+</body>
+
+</html>

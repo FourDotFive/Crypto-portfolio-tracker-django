@@ -10,3 +10,7 @@
 #login_btn:hover {
     color: #0d6efd;
 }
+
+#toplist_by_market_cap a {
+    text-decoration: none;
+}

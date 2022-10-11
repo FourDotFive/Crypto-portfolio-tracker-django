@@ -1,7 +1,6 @@
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
-import pprint
 import environ
 
 
@@ -24,6 +23,5 @@ def get_toplist_by_market_cap(limit: int = 10):
             }
         return cleaned_data
     except (ConnectionError, Timeout, TooManyRedirects) as e:
-        pprint.pprint(e)
         return e
 
