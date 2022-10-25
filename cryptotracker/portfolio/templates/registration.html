@@ -3,19 +3,20 @@
 
 {% block title %}Registration{% endblock %}
 
-{% block additional_libraries %}{% endblock %}
+{% block dependencies %}{% endblock %}
 
 {% block content %}
 
 <div class="container mt-4">
     <div class="row">
 
-        <div class="col-6 mx-auto">
-
+        <div class="col-4 mx-auto">
+            <h1>Registration</h1>
+            <h6>Start managing your crypto portfolio like a pro &#128526;</h6>
             <form method="post">
                 {% csrf_token %}
                 {{ registration_form|crispy }}
-                <button class="btn btn-primary" type="submit">Register</button>
+                <button class="btn btn-primary mt-3 mb-3" type="submit">Register</button>
                 <p class="text-center">If you already have an account, <a href="/login">login</a> instead.</p>
             </form>
 

@@ -4,7 +4,7 @@
 
 {% block title %}Chart{% endblock %}
 
-{% block additional_libraries %}
+{% block dependencies %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <link rel="stylesheet" href="{% static 'css/apexcharts.css' %}">
 {% endblock %}
@@ -20,7 +20,7 @@
 </div>
 
 <script>
-    let crypto_1y_data = "{{ crypto_1y_data_dict|safe }}".replaceAll("'", "\"")
+    let crypto_1y_data = "{{ crypto_data_dict|safe }}".replaceAll("'", "\"");
     crypto_1y_data = JSON.parse(crypto_1y_data);
 </script>
 

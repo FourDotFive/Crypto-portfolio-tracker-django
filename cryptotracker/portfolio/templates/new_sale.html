@@ -1,0 +1,52 @@
+{% extends "main.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sale{% endblock %}
+
+{% block dependencies %}{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row">
+
+        <div class="col-4 mx-auto">
+
+            <h1>Register New Sale</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ sale_form|crispy }}
+                <div class="d-flex justify-content-between mt-3">
+                    <div>
+                        <button class="btn btn-primary" type="submit">Add Sale</button>
+                    </div>
+                    <div>
+                        <a class="btn btn-warning rounded" href="{% url 'portfolio' %}" role="button">Cancel</a>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+</div>
+
+{% if available_crypto_assets_and_amount %}
+<script>
+    let available_crypto_assets_and_amount = JSON.parse('{{ available_crypto_assets_and_amount|safe }}');
+
+    $(document).ready(function () {
+        let crypto = $('#id_crypto').val();
+        let text = "Available amount of " + crypto + " is " + available_crypto_assets_and_amount[crypto]
+        $("#hint_id_amount ul li").text(text);
+    });
+
+    $("#id_crypto").on("change", function () {
+        let crypto = $('#id_crypto').val();
+        let text = "Available amount of " + crypto + " is " + available_crypto_assets_and_amount[crypto]
+        $("#hint_id_amount ul li").text(text);
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -12,7 +12,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os.path
 from pathlib import Path
 import environ
+from django.contrib.messages import constants as message_constants
 
+
+MESSAGE_TAGS = {
+    message_constants.INFO: '',
+    message_constants.WARNING: '',
+    message_constants.ERROR: '',
+    message_constants.SUCCESS: ''
+}
 
 env = environ.Env()
 environ.Env.read_env()
@@ -106,6 +114,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
