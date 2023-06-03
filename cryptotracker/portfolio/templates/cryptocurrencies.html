@@ -7,55 +7,64 @@
 {% block dependencies %}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <link rel="stylesheet" href="{% static 'css/apexcharts.css' %}">
-<script src="{% static 'js/cryptocompare_connection.js' %}"></script>
+<script src="{% static 'js/cryptocurrencies_table.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/cryptocurrencies.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<div class="row mt-3">
-    <div class="col-7 mx-auto">
-        <div class="input-group">
-            <div class="col-sm-8">
-                <h4>Toplist by Market Cap Full Data</h4>
-            </div>
-            <div class="col-sm-4">
-                <input class="form-control" placeholder="Search" type="text">
+<div class="container">
+
+    <div class="row mt-3">
+        <div class="col-7 mx-auto">
+            <div class="input-group">
+                <div class="col-sm-8">
+                    <h4>Toplist by Market Cap Full Data</h4>
+                </div>
+                <div class="col-sm-4">
+                    <input class="form-control" placeholder="Search" type="text">
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-7 mx-auto">
+    <div class="row">
+        <div class="col-7 mx-auto">
 
-        <table class="table mb-5 mt-1">
-            <thead>
-                <th>Name</th>
-                <th>Market Cap</th>
-                <th>Price</th>
-                <th>Chg in 1h</th>
-                <th>Chg in 24h</th>
-            </thead>
-            <tbody id="toplist_by_market_cap">
-                {% for crypto_name, data in toplist_by_market_cap.items %}
-                <tr id="{{ data.Symbol|lower }}">
-                    <td>
-                        <a href="{% url 'graph' data.Symbol|lower %}">
-                            <img src="{{ data.ImageUrl }}" width="25">
-                            {{ data.Symbol }}
-                        </a>
-                    </td>
-                    <td id="{{ data.Symbol|lower }}_marketcap"></td>
-                    <td id="{{ data.Symbol|lower }}_price"></td>
-                    <td id="{{ data.Symbol|lower }}_change1h"></td>
-                    <td id="{{ data.Symbol|lower }}_change24h"></td>
+            <table class="table mb-5 mt-1">
+                <thead>
+                    <th>Name</th>
+                    <th>Market Cap</th>
+                    <th>Price</th>
+                    <th>Chg in 1h</th>
+                    <th>Chg in 24h</th>
+                </thead>
+                <tbody id="toplist_by_market_cap">
+                    {% for crypto_name, data in toplist_by_market_cap.items %}
+                    <tr id="{{ data.Symbol|lower }}">
+                        <td>
+                            <a href="{% url 'graph' data.Symbol|lower %}">
+                                <img src="{{ data.ImageUrl }}" width="25">
+                                {{ data.Symbol }}
+                            </a>
+                        </td>
+                        <td id="{{ data.Symbol|lower }}_marketcap"></td>
+                        <td id="{{ data.Symbol|lower }}_price"></td>
+                        <td id="{{ data.Symbol|lower }}_change1h"></td>
+                        <td id="{{ data.Symbol|lower }}_change24h"></td>
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
+        </div>
     </div>
+
+
 </div>
-</div>
+
+
+
+
 {% endblock %}

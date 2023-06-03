@@ -1,43 +1,16 @@
 import json
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-from .forms import RegistrationForm, LoginForm, PurchaseForm, SaleForm
+from .forms import PurchaseForm, SaleForm
 from .models import Purchase, Sale
-from .utils.cryptocompare_connection import get_toplist_by_market_cap
-from .utils.portfolio_utils import get_available_assets_and_amount, get_portfolio_df, get_portfolio_dict
-from .utils.yfinance_connection import get_crypto_graph_data
+from .utils.cryptocompare_connection import get_toplist_by_market_cap, get_crypto_history
+from .utils.portfolio_utils import get_available_assets_and_amount, get_portfolio_df, get_portfolio_dict, get_purchases_df
 
 
-def registration_view(request):
-    if request.method == "POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                f'Welcome {user.username}',
-                extra_tags='Successful registration'
-            )
-            return redirect('main')
-        messages.add_message(
-            request,
-            messages.WARNING, 'Follow the instructions.',
-            extra_tags='Unsuccessful registration'
-        )
-        return render(request, 'registration.html', context={'registration_form': form})
-
-    form = RegistrationForm()
-    return render(request, 'registration.html', context={'registration_form': form})
-
-
-@login_required(login_url='/login')
+@login_required(login_url='user/login')
 def new_purchase_view(request):
     if request.method == "POST":
         form = PurchaseForm(request.POST)
@@ -59,7 +32,7 @@ def new_purchase_view(request):
     return render(request, 'new_purchase.html', context={'purchase_form': form})
 
 
-@login_required(login_url='/login')
+@login_required(login_url='user/login')
 def new_sale_view(request):
     available_crypto_assets_and_amount = get_available_assets_and_amount(request)
     if request.method == "POST":
@@ -90,41 +63,6 @@ def new_sale_view(request):
     return render(request, 'new_sale.html', context=context)
 
 
-def login_view(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    f'You are now logged in as {username}.',
-                    extra_tags='Welcome back'
-                )
-                return redirect('main')
-            else:
-                messages.add_message(
-                    request,
-                    messages.WARNING,
-                    'Invalid username or password.',
-                    extra_tags='Unsuccessful login'
-                )
-                return render(request, 'login.html', context={'login_form': form})
-    form = LoginForm()
-    return render(request, 'login.html', context={'login_form': form})
-
-
-@login_required(login_url='/login')
-def logout_view(request):
-    if request.user.is_authenticated:
-        logout(request)
-    return redirect('main')
-
-
 def main_page_view(request):
     return render(request, 'main.html', context={})
 
@@ -141,7 +79,7 @@ def error_404_view(request, exception):
     return render(request, '404.html')
 
 
-@login_required(login_url='/login')
+@login_required(login_url='user/login')
 def portfolio_view(request):
     portfolio_df = get_portfolio_df(request)
 
@@ -164,24 +102,24 @@ def portfolio_view(request):
     return render(request, 'portfolio.html', context=context)
 
 
-@login_required(login_url='/login')
-def delete_portfolio_view(request):
-    user = request.user
-    Purchase.objects.filter(user=user).delete()
-    Sale.objects.filter(user=user).delete()
-    context = {
-        # 'portfolio': portfolio
-    }
-    return render(request, 'portfolio.html', context=context)
-
-
-def crypto_graph_view(request, crypto):
-    crypto_data_dict = get_crypto_graph_data(crypto)
+def crypto_history_graph_view(request, crypto):
+    crypto_history = get_crypto_history(crypto)
     context = {
         "crypto_usd": crypto.upper() + '-USD',
-        "crypto_data_dict": crypto_data_dict
+        "crypto_history": json.dumps(crypto_history)
     }
     return render(request, 'crypto_chart.html', context=context)
 
 
+@login_required(login_url='user/login')
+def get_all_purchases_view(request):
+    purchases = Purchase.objects.filter(user=request.user).values()
+    purchases_df = get_purchases_df(purchases)
+    purchases_df.sort_values(by=['date'], inplace=True, ascending=False)
 
+    purchases = purchases_df.to_dict('index')
+
+    context = {
+        'purchases': purchases
+    }
+    return render(request, 'all_purchases.html', context=context)

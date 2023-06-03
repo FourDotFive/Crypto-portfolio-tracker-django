@@ -20,50 +20,62 @@
 </div>
 
 <script>
-    let crypto_1y_data = "{{ crypto_data_dict|safe }}".replaceAll("'", "\"");
-    crypto_1y_data = JSON.parse(crypto_1y_data);
+    let crypto_history = '{{ crypto_history|safe }}'
+    crypto_history = JSON.parse(crypto_history);
+    console.log(crypto_history);
 </script>
 
 <script>
     var options = {
         series: [{
-            data: crypto_1y_data
+            name: "Price",
+            data: crypto_history
         }],
         chart: {
-            type: 'candlestick',
-            height: 500,
+            type: 'area',
+            stacked: false,
+            height: 400,
             zoom: {
-                enabled: true,
                 type: 'x',
-                autoScaleYaxis: true,
-                zoomedArea: {
-                    fill: {
-                        color: '#90CAF9',
-                        opacity: 0.4
-                    },
-                    stroke: {
-                        color: '#0D47A1',
-                        opacity: 0.4,
-                        width: 1
-                    }
-                }
+                enabled: true,
+                autoScaleYaxis: true
+            },
+            toolbar: {
+                autoSelected: 'zoom'
             }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        markers: {
+            size: 0,
         },
         title: {
             text: '{{ crypto_usd }}',
             align: 'left'
         },
-        xaxis: {
-            type: 'datetime'
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.5,
+                opacityTo: 0,
+                stops: [0, 90, 100]
+            },
         },
         yaxis: {
-            tooltip: {
-                enabled: true
-            }
+            title: {
+                text: 'Price'
+            },
+        },
+        xaxis: {
+            type: 'datetime',
         }
     };
 
     var chart = new ApexCharts(document.querySelector("#chart"), options);
     chart.render();
 </script>
+
 {% endblock %}

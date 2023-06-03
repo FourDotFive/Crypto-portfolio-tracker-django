@@ -1,3 +1,6 @@
+import pprint
+
+import pandas as pd
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
@@ -74,5 +77,20 @@ def get_coins_prices_and_images(coins: str, currency: str = 'USD'):
             prices[coin] = data['RAW'][coin][currency]['PRICE']
             images[coin] = 'https://www.cryptocompare.com' + data['RAW'][coin][currency]['IMAGEURL']
         return prices, images
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+        return e
+
+
+def get_crypto_history(coin: str, currency: str = 'USD'):
+    url = f'https://min-api.cryptocompare.com/data/v2/histoday?fsym={coin.upper()}&tsym={currency.upper()}' \
+          f'&limit=900&aggregate=1&e=CCCAGG&api_key='
+
+    try:
+        response = requests.get(url + cryptocompare_api_key)
+        data = json.loads(response.text)
+        df = pd.DataFrame(data['Data']['Data'], columns=['time', 'close'])
+        df['time'] = pd.to_datetime(df['time'], unit='s')
+        df['time'] = df['time'].dt.strftime('%Y-%m-%d')
+        return df.values.tolist()
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         return e

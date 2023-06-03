@@ -10,11 +10,3 @@
 #animated_btn:hover {
     color: #0d6efd;
 }
-
-#toplist_by_market_cap a {
-    text-decoration: none;
-}
-
-img {
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-}

@@ -1,0 +1,77 @@
+{% extends "main.html" %}
+
+{% load static %}
+
+{% block title %}Cryptocurrencies{% endblock %}
+
+{% block dependencies %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+<link rel="stylesheet" href="{% static 'css/table_decoration.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row mt-3">
+        <div class="col-7 mx-auto">
+            <div class="input-group">
+                <div class="col-sm-8">
+                    <h4>All Purchases</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-7 mx-auto">
+
+            <table class="table mb-5 mt-1" id="data_table">
+                <thead>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Amount</th>
+                    <th>Spent</th>
+                    <th>Action</th>
+                </thead>
+                <tbody id="toplist_by_market_cap">
+                    {% for row_id, data in purchases.items %}
+                    <tr id="{{ data.Symbol|lower }}">
+                        <td>
+                            <a href="{% url 'graph' data.crypto|lower %}">
+                                <img src="{{ data.ImageUrl }}" width="25">{{ data.crypto }}
+                            </a>
+                        </td>
+
+                        <td>{{ data.date|date:'m.d.Y' }}</td>
+                        <td>{{ data.price }}</td>
+                        <td>{{ data.amount }}</td>
+                        <td>{{ data.spent }}</td>
+                        <td>
+                            <a class="btn btn-success" href="#" role="button"><i class="bi bi-pencil-square"
+                                    style="font-size: 13px;"></i></a>
+                            <a class="btn btn-danger" href="#" role="button"><i class="bi bi-trash-fill"
+                                    style="font-size: 13px;"></i></a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#data_table').DataTable();
+    });
+</script>
+
+
+{% endblock %}

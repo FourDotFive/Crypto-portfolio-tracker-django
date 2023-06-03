@@ -100,6 +100,8 @@ def clean_portfolio_df(purchases_df, sales_df=None):
     purchases_df.loc[purchases_df['average_price'] < 0, 'average_price'] = 0
     purchases_df['total_profit'] = round(purchases_df['earned'] - purchases_df['spent'] + purchases_df['current_value'], 2)
 
+    purchases_df.sort_values(by=['current_value'], inplace=True, ascending=False)
+
     return purchases_df
 
 
@@ -123,4 +125,5 @@ def get_portfolio_dict(portfolio_df) -> dict:
         portfolio[crypto]['average_price'] = round(average_price, get_n_for_rounding(average_price) + 1)
 
     return portfolio
+
 
